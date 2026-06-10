@@ -26,7 +26,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 st.markdown('<p class="main-title">📊 RCO Assistant</p>', unsafe_allow_html=True)
-st.markdown("**Plataforma de análise de opções** baseada na metodologia Jimmy Carvalho · Renda Com Opções")
+st.markdown("**Plataforma de análise de opções** baseada na metodologia · Renda Com Opções")
 st.divider()
 
 st.markdown("### Navegue pelas páginas:")
