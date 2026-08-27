@@ -381,4 +381,50 @@ def recomendar(mkt: Mercado) -> list[dict]:
                     "prioridade": "Média", "tab": "venda_coberta"})
     return rec
 
+# Adicione esta função ao final do arquivo rco_core.py
+def calcular_atr(dados: list, periodo: int = 14) -> dict:
+    """
+    Calcula o ATR (Average True Range) com base em uma lista de dados do Yahoo Finance ou similar.
+    Estrutura esperada de 'dados': [{'date': '2023-01-01', 'open': 10, 'high': 12, 'low': 9, 'close': 11}, ...]
+    Retorna o valor do ATR e os níveis de suporte/resistência.
+    """
+    if len(dados) < periodo:
+        return {"erro": "Dados insuficientes para calcular ATR"}
 
+    trs = []
+    for i in range(1, len(dados)):
+        high = dados[i]["high"]
+        low = dados[i]["low"]
+        prev_close = dados[i-1]["close"]
+        
+        tr = max(high - low, abs(high - prev_close), abs(low - prev_close))
+        trs.append(tr)
+
+    # ATR Wilder
+    atr = sum(trs[:periodo]) / periodo
+    for i in range(periodo, len(trs)):
+        atr = (atr * (periodo - 1) + trs[i]) / periodo
+
+    # Usa o último preço como base para calcular os níveis (como na sua imagem)
+    preco_atual = dados[-1]["close"]
+    
+    # Níveis de Fibonacci (como na imagem)
+    niveis = {
+        "±0,236": preco_atual - (atr * 0.236),
+        "±0,382": preco_atual - (atr * 0.382),
+        "±0,5":   preco_atual - (atr * 0.5),
+        "±0,618": preco_atual - (atr * 0.618),
+        "±0,786": preco_atual - (atr * 0.786),
+        "+1":     preco_atual + atr,
+        "+2":     preco_atual + (2 * atr),
+        "+3":     preco_atual + (3 * atr),
+    }
+
+    return {
+        "atr": round(atr, 4),
+        "atr_pct": round((atr / preco_atual) * 100, 2),
+        "preco_atual": preco_atual,
+        "niveis": niveis,
+        "dados": dados,
+        "periodo": periodo
+    }
